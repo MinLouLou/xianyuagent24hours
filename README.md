@@ -163,13 +163,6 @@ cp prompts/price_prompt_example.txt prompts/price_prompt.txt
 
 ---
 
-## 📝 致谢
-
-- 原项目：[shaxiu/XianyuAutoAgent](https://github.com/shaxiu/XianyuAutoAgent)
-- 飞书开放平台：[open.feishu.cn](https://open.feishu.cn)
-
----
-
 ## ⚠️ 免责声明
 
 本项目仅供学习与技术研究使用，请遵守闲鱼平台用户协议，勿用于违规用途。
