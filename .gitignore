@@ -1,0 +1,38 @@
+# 敏感配置（绝不上传）
+.env
+*.env
+
+# 数据库（含聊天记录）
+data/
+*.db
+*.sqlite
+
+# Python 缓存
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+
+# 虚拟环境
+venv/
+.venv/
+env/
+.env/
+
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# 日志
+*.log
+logs/
+
+# 自定义提示词（个人配置，不上传）
+prompts/classify_prompt.txt
+prompts/price_prompt.txt
+prompts/tech_prompt.txt
+prompts/default_prompt.txt
