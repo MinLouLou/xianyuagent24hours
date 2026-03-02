@@ -77,6 +77,7 @@ def start_account(account: dict):
         [sys.executable, MAIN_PATH, "--env", env_path],
         cwd=BASE_DIR,
         env=env,
+        stdin=subprocess.DEVNULL,
     )
     _processes[name] = proc
     logger.success(f"账号 [{name}] 已启动，PID: {proc.pid}")
