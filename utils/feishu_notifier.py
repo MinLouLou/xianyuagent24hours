@@ -1,4 +1,8 @@
+import base64
+import hashlib
+import hmac
 import os
+import time
 import requests
 from loguru import logger
 
@@ -30,6 +34,7 @@ class FeishuNotifier:
 
         # 模式二：Webhook
         self.webhook_url = os.getenv("FEISHU_WEBHOOK_URL", "")
+        self.webhook_secret = os.getenv("FEISHU_WEBHOOK_SECRET", "")
 
         # 判断启用哪种模式
         self.mode = None
@@ -215,10 +220,27 @@ class FeishuNotifier:
 
     # ---------- 模式二：群 Webhook ----------
 
+    def _gen_webhook_sign(self, timestamp: str) -> str:
+        """生成飞书 Webhook 签名（HMAC-SHA256）"""
+        string_to_sign = f"{timestamp}\n{self.webhook_secret}"
+        hmac_code = hmac.new(
+            string_to_sign.encode("utf-8"),
+            b"",
+            digestmod=hashlib.sha256
+        ).digest()
+        return base64.b64encode(hmac_code).decode("utf-8")
+
     def _send_via_webhook(self, card: dict):
         """通过自定义机器人 Webhook 发送群消息"""
         try:
-            resp = requests.post(self.webhook_url, json=card, timeout=5)
+            payload = dict(card)
+            # 如果配置了签名密钥，加上签名
+            if self.webhook_secret:
+                timestamp = str(int(time.time()))
+                payload["timestamp"] = timestamp
+                payload["sign"] = self._gen_webhook_sign(timestamp)
+
+            resp = requests.post(self.webhook_url, json=payload, timeout=5)
             result = resp.json()
             if result.get("code") != 0:
                 logger.warning(f"飞书 Webhook 发送失败: {result}")

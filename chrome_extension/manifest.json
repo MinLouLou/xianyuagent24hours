@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "闲鱼Cookie同步助手",
+  "version": "1.0",
+  "description": "一键同步闲鱼Cookie到客服机器人，自动更新配置并重启服务",
+  "permissions": [
+    "cookies",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://*.goofish.com/*",
+    "https://goofish.com/*",
+    "http://localhost:8899/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "同步闲鱼Cookie"
+  }
+}

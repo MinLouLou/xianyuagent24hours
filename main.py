@@ -61,6 +61,9 @@ class XianyuLive:
         # 模拟人工输入配置
         self.simulate_human_typing = os.getenv("SIMULATE_HUMAN_TYPING", "False").lower() == "true"
 
+        # 自动回复开关（False=只转发飞书，不回复买家）
+        self.auto_reply = os.getenv("AUTO_REPLY", "true").lower() == "true"
+
     async def refresh_token(self):
         """刷新token"""
         try:
@@ -470,6 +473,12 @@ class XianyuLive:
                 chat_id=chat_id,
             )
 
+            # 自动回复关闭时，只转发飞书通知，不做 AI 回复
+            if not self.auto_reply:
+                self.context_manager.add_message_by_chat(chat_id, send_user_id, item_id, "user", send_message)
+                logger.info(f"[仅转发模式] 已推送飞书，不自动回复")
+                return
+
             # 获取对话上下文并生成回复
             context = self.context_manager.get_context_by_chat(chat_id)
             bot_reply = bot.generate_reply(
@@ -675,22 +684,34 @@ def check_and_complete_env():
 
 
 if __name__ == '__main__':
-    if os.path.exists(".env"):
-        load_dotenv()
-        logger.info("已加载 .env 配置")
+    import argparse
+    parser = argparse.ArgumentParser(description="闲鱼智能客服机器人")
+    parser.add_argument("--env", type=str, default=None,
+                        help="指定账号的 .env 文件路径，用于多账号部署")
+    args = parser.parse_args()
 
+    # 加载顺序：.env.example（默认值）→ 根目录 .env（共享配置）→ 账号 .env（账号专属，最高优先级）
     if os.path.exists(".env.example"):
         load_dotenv(".env.example")
         logger.info("已加载 .env.example 默认配置")
 
-    log_level = os.getenv("LOG_LEVEL", "DEBUG").upper()
+    if os.path.exists(".env"):
+        load_dotenv(".env", override=True)
+        logger.info("已加载根目录 .env 配置（飞书/模型等共享配置）")
+
+    if args.env and os.path.exists(args.env):
+        load_dotenv(args.env, override=True)
+        logger.info(f"已加载账号配置: {args.env}")
+
+    log_level = os.getenv("LOG_LEVEL", "INFO").upper()
     logger.remove()
     logger.add(
         sys.stderr,
         level=log_level,
         format=" {time:YYYY-MM-DD HH:mm:ss.SSS} | {level: <8} | {name}: {function}: {line} - {message} "
     )
-    logger.info(f"日志级别设置为: {log_level}")
+    account_name = os.getenv("ACCOUNT_NAME", "默认账号")
+    logger.info(f"启动账号：{account_name}")
 
     check_and_complete_env()
 

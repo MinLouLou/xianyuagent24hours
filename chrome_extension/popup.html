@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>闲鱼Cookie同步</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      width: 300px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f5f7fa;
+      color: #333;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #ff6b35, #ff8c42);
+      padding: 16px 20px;
+      color: white;
+    }
+
+    .header h1 { font-size: 15px; font-weight: 600; }
+    .header p  { font-size: 11px; opacity: 0.85; margin-top: 3px; }
+
+    .body { padding: 16px 20px; }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    select {
+      width: 100%;
+      padding: 9px 10px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 13px;
+      background: white;
+      margin-bottom: 12px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    select:focus { border-color: #ff6b35; }
+
+    .status-box {
+      background: white;
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      border: 1px solid #e8eaed;
+      font-size: 12px;
+      color: #666;
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #ccc;
+      flex-shrink: 0;
+    }
+
+    .success .dot { background: #34c759; }
+    .error   .dot { background: #ff3b30; }
+    .loading .dot { background: #ff6b35; animation: pulse 1s infinite; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.3; }
+    }
+
+    .btn {
+      width: 100%;
+      padding: 11px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: linear-gradient(135deg, #ff6b35, #ff8c42);
+      color: white;
+    }
+
+    .btn:hover   { opacity: 0.9; transform: translateY(-1px); }
+    .btn:active  { transform: translateY(0); }
+    .btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+
+    .tip {
+      font-size: 11px;
+      color: #999;
+      text-align: center;
+      margin-top: 10px;
+      line-height: 1.6;
+    }
+
+    .account-badge {
+      display: inline-block;
+      background: #fff3ee;
+      color: #ff6b35;
+      border: 1px solid #ffd4c2;
+      border-radius: 4px;
+      padding: 2px 7px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🐟 闲鱼 Cookie 同步助手</h1>
+    <p>多账号隔离管理，自动同步 Cookie</p>
+  </div>
+
+  <div class="body">
+    <label>选择账号</label>
+    <select id="accountSelect">
+      <option value="">-- 加载中 --</option>
+    </select>
+
+    <div class="status-box" id="statusBox">
+      <div class="dot"></div>
+      <span id="statusText">请选择账号后点击同步</span>
+    </div>
+
+    <button class="btn" id="syncBtn" disabled>
+      🔄 同步 Cookie 到选中账号
+    </button>
+
+    <p class="tip">
+      请确保已在 goofish.com 登录对应闲鱼账号<br>
+      同步后该账号的机器人将自动重启
+    </p>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
