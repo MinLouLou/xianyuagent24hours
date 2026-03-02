@@ -258,7 +258,7 @@ def main():
     logger.info("启动多账号闲鱼客服管理服务...")
     start_all()
 
-    server = HTTPServer(("localhost", PORT), CookieHandler)
+    server = HTTPServer(("0.0.0.0", PORT), CookieHandler)
     logger.info(f"Cookie 接收服务已启动，监听 localhost:{PORT}")
     logger.info("Chrome 插件选择账号后点击「同步」即可自动更新 Cookie 并重启对应账号")
     logger.info("按 Ctrl+C 退出所有进程")
