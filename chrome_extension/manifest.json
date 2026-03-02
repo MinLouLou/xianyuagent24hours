@@ -10,7 +10,8 @@
   "host_permissions": [
     "https://*.goofish.com/*",
     "https://goofish.com/*",
-    "http://localhost:8899/*"
+    "http://localhost:8899/*",
+    "http://43.156.81.25:8899/*"
   ],
   "action": {
     "default_popup": "popup.html",

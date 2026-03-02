@@ -1,4 +1,4 @@
-const SERVER = "http://localhost:8899";
+const SERVER = "http://43.156.81.25:8899";
 
 function setStatus(type, text) {
   const box = document.getElementById("statusBox");
