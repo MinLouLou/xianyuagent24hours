@@ -701,6 +701,7 @@ if __name__ == '__main__':
 
     if args.env and os.path.exists(args.env):
         load_dotenv(args.env, override=True)
+        os.environ["_ACCOUNT_ENV_PATH"] = os.path.abspath(args.env)
         logger.info(f"已加载账号配置: {args.env}")
 
     log_level = os.getenv("LOG_LEVEL", "INFO").upper()

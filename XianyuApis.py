@@ -172,21 +172,50 @@ class XianyuApis:
             return self.get_token(device_id, retry + 1)
 
     def _handle_risk_control(self, device_id: str) -> dict:
-        """触发风控时，引导用户更新 Cookie 后重试"""
+        """触发风控时处理：交互模式下等待用户输入，后台模式下等待 Cookie 文件更新"""
         logger.error("触发风控（被挤爆），请进入闲鱼网页版过滑块后重新复制 Cookie")
-        print("\n" + "=" * 60)
-        new_cookie = input("请粘贴最新 Cookie（直接回车则退出）: ").strip()
-        print("=" * 60 + "\n")
-        if not new_cookie:
-            sys.exit(1)
-        try:
-            self._update_cookies_from_str(new_cookie)
-            self._sync_cookies_to_env()
-            logger.success("Cookie 已更新，重新尝试获取 Token...")
-            return self.get_token(device_id, 0)
-        except Exception as e:
-            logger.error(f"Cookie 解析失败: {e}")
-            sys.exit(1)
+
+        # 判断是否有可用的标准输入（本地交互模式）
+        import sys, os
+        is_interactive = sys.stdin and sys.stdin.isatty()
+
+        if is_interactive:
+            print("\n" + "=" * 60)
+            new_cookie = input("请粘贴最新 Cookie（直接回车则退出）: ").strip()
+            print("=" * 60 + "\n")
+            if not new_cookie:
+                sys.exit(1)
+            try:
+                self._update_cookies_from_str(new_cookie)
+                self._sync_cookies_to_env()
+                logger.success("Cookie 已更新，重新尝试获取 Token...")
+                return self.get_token(device_id, 0)
+            except Exception as e:
+                logger.error(f"Cookie 解析失败: {e}")
+                sys.exit(1)
+        else:
+            # 后台模式：每30秒检查一次 .env 文件中的 Cookie 是否已更新
+            logger.warning("后台运行模式，等待 Cookie 更新（请通过插件或手动更新 .env 文件）...")
+            env_path = os.path.join(os.getcwd(), ".env")
+            # 获取当前 Cookie 用于对比
+            current_cookie = self.session.cookies.get("_m_h5_tk", "")
+            while True:
+                time.sleep(30)
+                logger.info("检查 Cookie 是否已更新...")
+                try:
+                    from dotenv import dotenv_values
+                    # 找账号专属 .env
+                    env_file = os.getenv("_ACCOUNT_ENV_PATH", env_path)
+                    values = dotenv_values(env_file)
+                    new_cookie_str = values.get("COOKIES_STR", "")
+                    if new_cookie_str:
+                        self._update_cookies_from_str(new_cookie_str)
+                        new_tk = self.session.cookies.get("_m_h5_tk", "")
+                        if new_tk != current_cookie:
+                            logger.success("检测到新 Cookie，重新尝试连接...")
+                            return self.get_token(device_id, 0)
+                except Exception as e:
+                    logger.debug(f"检查 Cookie 时出错: {e}")
 
     # ------------------------------------------------------------------ #
     #  商品信息
